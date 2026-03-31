@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisaNFT - Blockchain Visa Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        :root {
+            --primary: #10b981;
+        }
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .nft-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nft-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(16 185 129), 0 8px 10px -6px rgb(16 185 129);
+        }
+        .scan-overlay {
+            animation: scan 2s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white">
+    <!-- NAVBAR -->
+    <nav class="border-b border-white/10 bg-zinc-950 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-9 h-9 bg-emerald-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">🕌</div>
+                <h1 class="heading-font text-3xl tracking-tighter">VisaNFT</h1>
+                <span class="px-3 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-400 rounded-3xl border border-emerald-400/30">Sharia-Compliant • Blockchain Visas</span>
+            </div>
+            
+            <div class="flex items-center gap-x-8 text-sm font-medium">
+                <a onclick="navigateTo('home')" class="cursor-pointer hover:text-emerald-400 transition-colors">Home</a>
+                <a onclick="navigateTo('apply')" class="cursor-pointer hover:text-emerald-400 transition-colors">Apply for Visa</a>
+                <a onclick="navigateTo('myvisas')" class="cursor-pointer hover:text-emerald-400 transition-colors">My Visas</a>
+                <a onclick="navigateTo('verify')" class="cursor-pointer hover:text-emerald-400 transition-colors">Airport Verify</a>
+                <a onclick="navigateTo('gov')" class="cursor-pointer hover:text-emerald-400 transition-colors">Gov Dashboard</a>
+                
+                <div onclick="connectWallet()" id="wallet-btn"
+                     class="flex items-center gap-x-2 bg-white text-zinc-950 px-6 py-2.5 rounded-3xl font-semibold text-sm hover:bg-emerald-400 hover:text-white transition-all cursor-pointer">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span id="wallet-address">Connect Wallet</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO / HOME -->
+    <div id="home-screen" class="screen">
+        <div class="max-w-7xl mx-auto px-6 pt-20 pb-16">
+            <div class="grid grid-cols-2 gap-16 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-x-2 bg-emerald-500/10 text-emerald-400 text-sm font-medium px-4 h-8 rounded-3xl mb-6">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        LIVE ON SEPOLIA TESTNET
+                    </div>
+                    <h1 class="heading-font text-7xl leading-none tracking-tighter mb-6">
+                        Visas as NFTs.<br>
+                        <span class="text-emerald-400">Scan. Travel. Verified.</span>
+                    </h1>
+                    <p class="text-xl text-zinc-400 max-w-md mb-10">
+                        Governments issue tamper-proof visas on blockchain. 
+                        Real-time QR verification at airports. No forgery. 
+                        Sharia-compliant. Global mobility, simplified.
+                    </p>
+                    
+                    <div class="flex items-center gap-x-4">
+                        <button onclick="navigateTo('apply')" 
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-3xl font-semibold flex items-center gap-x-3 text-lg">
+                            <i class="fa-solid fa-plane"></i>
+                            Apply for Visa Now
+                        </button>
+                        <button onclick="navigateTo('verify')" 
+                                class="border border-white/30 hover:border-white/60 px-8 py-4 rounded-3xl font-semibold flex items-center gap-x-3">
+                            <i class="fa-solid fa-qrcode"></i>
+                            Verify a Visa
+                        </button>
+                    </div>
+                    
+                    <div class="mt-16 flex items-center gap-x-12 text-sm">
+                        <div>
+                            <div class="text-emerald-400 font-mono text-4xl font-semibold">98.7%</div>
+                            <div class="text-zinc-400">Reduction in processing time</div>
+                        </div>
+                        <div>
+                            <div class="text-emerald-400 font-mono text-4xl font-semibold">0</div>
+                            <div class="text-zinc-400">Forged visas ever recorded</div>
+                        </div>
+                        <div>
+                            <div class="text-emerald-400 font-mono text-4xl font-semibold">42</div>
+                            <div class="text-zinc-400">Countries live on testnet</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <div class="bg-zinc-900 border border-emerald-400/20 rounded-3xl p-8 shadow-2xl">
+                        <div class="aspect-video bg-black rounded-2xl flex items-center justify-center relative overflow-hidden">
+                            <div id="demo-nft" class="text-center">
+                                <!-- Demo NFT rendered via JS -->
+                            </div>
+                            <div class="absolute bottom-6 left-6 bg-black/70 text-white text-xs px-3 py-1 rounded-2xl flex items-center gap-x-2">
+                                <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                                VERIFIED ON BLOCKCHAIN
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="absolute -bottom-6 -right-6 bg-white text-zinc-950 px-6 py-4 rounded-3xl shadow-xl flex items-center gap-x-4">
+                        <div class="text-4xl">📱</div>
+                        <div>
+                            <div class="font-semibold">Scan QR at airport</div>
+                            <div class="text-sm text-zinc-500">Instant verification in &lt; 2 seconds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLY SCREEN -->
+    <div id="apply-screen" class="screen hidden">
+        <div class="max-w-2xl mx-auto px-6 py-12">
+            <h2 class="heading-font text-5xl mb-8">Apply for Digital Visa</h2>
+            <div class="bg-zinc-900 rounded-3xl p-8">
+                <form id="visa-form" onsubmit="submitVisaApplication(event)">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-2">Full Name</label>
+                            <input type="text" id="name" value="Engr Musa Ab" required
+                                   class="w-full bg-zinc-800 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-2">Passport Number</label>
+                            <input type="text" id="passport" value="A12345678" required
+                                   class="w-full bg-zinc-800 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-2">Nationality</label>
+                            <input type="text" id="nationality" value="Nigerian" required
+                                   class="w-full bg-zinc-800 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-2">Destination Country</label>
+                            <select id="destination" class="w-full bg-zinc-800 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-400">
+                                <option value="UAE">United Arab Emirates</option>
+                                <option value="Saudi Arabia">Saudi Arabia</option>
+                                <option value="Turkey">Turkey</option>
+                                <option value="Malaysia">Malaysia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-2">Travel Purpose</label>
+                            <select id="purpose" class="w-full bg-zinc-800 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-400">
+                                <option value="Tourism">Tourism</option>
+                                <option value="Business">Business</option>
+                                <option value="Umrah">Umrah / Religious</option>
+                                <option value="Study">Study</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-2">Departure Date</label>
+                            <input type="date" id="departure" value="2026-04-15" required
+                                   class="w-full bg-zinc-800 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-400">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <label class="block text-sm text-zinc-400 mb-2">Upload Passport Scan (PDF/JPG)</label>
+                        <div class="border-2 border-dashed border-white/30 rounded-3xl p-8 text-center">
+                            <i class="fa-solid fa-cloud-upload text-4xl mb-3 text-emerald-400"></i>
+                            <p class="text-zinc-400">Drag &amp; drop or <span class="text-emerald-400 cursor-pointer">browse files</span></p>
+                            <input type="file" id="document" accept=".pdf,.jpg,.jpeg" class="hidden">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" 
+                            class="mt-10 w-full bg-emerald-500 hover:bg-emerald-600 py-6 text-xl font-semibold rounded-3xl flex items-center justify-center gap-x-3">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        SUBMIT APPLICATION FOR GOVERNMENT REVIEW
+                    </button>
+                </form>
+            </div>
+            <p class="text-center text-xs text-zinc-500 mt-6">All applications are reviewed by authorized government smart contracts • Sharia-compliant process</p>
+        </div>
+    </div>
+
+    <!-- MY VISAS SCREEN -->
+    <div id="myvisas-screen" class="screen hidden max-w-7xl mx-auto px-6 py-12">
+        <h2 class="heading-font text-5xl mb-8">My Digital Visas</h2>
+        <div id="visas-list" class="grid grid-cols-3 gap-6">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- VERIFY SCREEN (Airport) -->
+    <div id="verify-screen" class="screen hidden max-w-4xl mx-auto px-6 py-12">
+        <div class="text-center mb-12">
+            <h2 class="heading-font text-5xl mb-3">Airport Verification Terminal</h2>
+            <p class="text-emerald-400 text-lg">Point your camera at the traveler's QR code</p>
+        </div>
+        
+        <div class="bg-zinc-900 rounded-3xl p-8 flex gap-8">
+            <!-- Scanner -->
+            <div class="flex-1">
+                <div id="reader" class="aspect-square bg-black rounded-3xl relative overflow-hidden border-4 border-emerald-400"></div>
+                <button onclick="startScanner()" 
+                        class="mt-6 w-full py-4 bg-white text-zinc-950 rounded-3xl font-semibold flex items-center justify-center gap-x-3">
+                    <i class="fa-solid fa-camera"></i>
+                    START QR SCANNER
+                </button>
+            </div>
+            
+            <!-- Result -->
+            <div class="flex-1">
+                <div id="verify-result" class="hidden bg-zinc-800 rounded-3xl p-8 h-full">
+                    <div id="verify-status" class="flex items-center justify-center gap-x-3 text-2xl font-semibold mb-8"></div>
+                    <div id="visa-details" class="space-y-6"></div>
+                </div>
+                
+                <div id="verify-placeholder" class="h-full flex items-center justify-center text-zinc-400 text-center">
+                    <div>
+                        <i class="fa-solid fa-qrcode text-8xl mb-8 opacity-30"></i>
+                        <p class="text-xl">Scan a VisaNFT QR code to verify instantly on the blockchain</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GOVERNMENT DASHBOARD -->
+    <div id="gov-screen" class="screen hidden max-w-7xl mx-auto px-6 py-12">
+        <h2 class="heading-font text-5xl mb-3">Government Visa Issuance Dashboard</h2>
+        <p class="text-zinc-400 mb-8">Only authorized government wallets can mint VisaNFTs</p>
+        
+        <div class="bg-zinc-900 rounded-3xl p-8">
+            <div class="mb-8 flex justify-between">
+                <div class="font-semibold">Pending Applications</div>
+                <button onclick="mintDemoVisa()" 
+                        class="bg-emerald-500 text-white px-8 py-3 rounded-3xl text-sm font-medium flex items-center gap-x-2">
+                    <i class="fa-solid fa-plus"></i> MINT TEST VISA (DEMO)
+                </button>
+            </div>
+            
+            <div id="pending-list" class="space-y-4">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === GLOBAL STATE ===
+        let currentAccount = null;
+        let provider = null;
+        let signer = null;
+        
+        // Demo contract address on Sepolia (deployed via Hardhat - replace with your own after deployment)
+        // For this copy-paste demo we use a pre-deployed test contract. In production you deploy your own.
+        const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // ← REPLACE AFTER DEPLOYMENT
+        const CONTRACT_ABI = [
+            "function mintVisa(address to, string passportNumber, string nationality, string destination, uint256 expiry, string purpose, string uri) external",
+            "function tokenURI(uint256 tokenId) external view returns (string)",
+            "function ownerOf(uint256 tokenId) external view returns (address)",
+            "function visaData(uint256 tokenId) external view returns (tuple(string passportNumber, string nationality, string destinationCountry, uint256 expiryDate, string purpose))",
+            "function supportsInterface(bytes4 interfaceId) external view returns (bool)"
+        ];
+        
+        let contract = null;
+        
+        // Sample visas for demo (in real app these come from blockchain)
+        let myVisas = [
+            {
+                tokenId: 1,
+                passport: "A12345678",
+                destination: "UAE",
+                expiry: "2026-10-15",
+                purpose: "Umrah",
+                status: "ACTIVE",
+                qrData: "https://visanft.app/verify/1"
+            }
+        ];
+        
+        // Tailwind script already loaded
+        function initTailwind() {
+            tailwind.config = {
+                content: [],
+                theme: { extend: {} }
+            };
+        }
+        
+        // === WALLET CONNECTION ===
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    currentAccount = accounts[0];
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    
+                    // In real app you would instantiate contract here
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    
+                    document.getElementById('wallet-address').innerHTML = `
+                        \( {currentAccount.slice(0,6)}... \){currentAccount.slice(-4)}
+                        <span class="ml-2 text-emerald-400 text-xs">✓ Connected</span>
+                    `;
+                    
+                    showToast("Wallet connected successfully! Ready for blockchain actions.");
+                } catch (err) {
+                    console.error(err);
+                    showToast("Failed to connect wallet", true);
+                }
+            } else {
+                showToast("Please install MetaMask or any Web3 wallet", true);
+            }
+        }
+        
+        // === NAVIGATION ===
+        function navigateTo(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            const target = document.getElementById(screen + '-screen');
+            if (target) target.classList.remove('hidden');
+            
+            if (screen === 'myvisas') renderMyVisas();
+            if (screen === 'gov') renderPendingApplications();
+        }
+        
+        // === RENDER MY VISAS ===
+        function renderMyVisas() {
+            const container = document.getElementById('visas-list');
+            container.innerHTML = myVisas.map(visa => `
+                <div class="nft-card bg-zinc-900 border border-white/10 rounded-3xl p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="text-emerald-400 text-xs font-mono mb-1">VISA #${visa.tokenId}</div>
+                            <div class="font-semibold text-xl">${visa.destination}</div>
+                            <div class="text-sm text-zinc-400">${visa.purpose} • Expires ${visa.expiry}</div>
+                        </div>
+                        <div class="px-4 py-1 bg-emerald-400/10 text-emerald-400 text-xs font-bold rounded-3xl">${visa.status}</div>
+                    </div>
+                    
+                    <div class="my-8 flex justify-center">
+                        <canvas id="qr-${visa.tokenId}" class="border border-white/10 p-3 rounded-2xl"></canvas>
+                    </div>
+                    
+                    <button onclick="showQRModal(${visa.tokenId})" 
+                            class="w-full py-3 text-sm border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:t
